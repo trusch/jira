@@ -83,6 +83,9 @@ fn get_credentials(pass: String, key: String) -> Result<(String, String), Box<dy
         .arg("-c")
         .arg(format!("{} {}", pass, key))
         .output()?;
+    if output.status.code().unwrap() != 0 {
+        panic!("failed to get credentials");
+    }
     let str = String::from_utf8(output.stdout).unwrap();
     let parts: Vec<&str> = str.split("\n").collect();
     let pw = String::from(parts[0]);
