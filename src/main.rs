@@ -28,7 +28,15 @@ struct Resp {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let matches = App::new("jira")
+    let matches = get_flags();
+    let assignee = String::from(matches.value_of("assignee").unwrap());
+    let pass_bin = String::from(matches.value_of("pass").unwrap());
+    let pass_key = String::from(matches.value_of("pass-key").unwrap());
+    list_issues(assignee, pass_bin, pass_key)
+}
+
+fn get_flags() -> clap::ArgMatches<'static> {
+    App::new("jira")
         .version("1.0")
         .author("Tino Rusch <tino.rusch@gmail.com>")
         .about("List your current tasks")
@@ -51,11 +59,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .default_value("gopass")
                 .help("pass binary to use"),
         )
-        .get_matches();
-    let assignee = String::from(matches.value_of("assignee").unwrap());
-    let pass_bin = String::from(matches.value_of("pass").unwrap());
-    let pass_key = String::from(matches.value_of("pass-key").unwrap());
-    list_issues(assignee, pass_bin, pass_key)
+        .get_matches()
 }
 
 fn list_issues(assignee: String, pass: String, key: String) -> Result<(), Box<dyn std::error::Error>> {
