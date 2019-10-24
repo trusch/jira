@@ -49,6 +49,10 @@ fn list_issues(assignee: &String, pass: &String, key: &String) -> Result<()> {
         .get(&request_url)
         .basic_auth(name, Some(pw))
         .send()?;
+    match response.status() {
+        reqwest::StatusCode::OK => {}
+        _ => return Err(error::new_box("failed to list issues")),
+    }
     let resp: types::Resp = response.json()?;
     print!("{}", resp);
     Ok(())
@@ -91,13 +95,16 @@ fn get_issue(id: &String, pass: &String, key: &String) -> Result<reqwest::Respon
         .get(&request_url)
         .basic_auth(name, Some(pw))
         .send()?;
-    Ok(response)
+    match response.status() {
+        reqwest::StatusCode::OK => Ok(response),
+        _ => Err(error::new_box("failed to find issue")),
+    }
 }
 
-fn exit(code: i32, msg: Option<&str>) {
+fn exit(code: i32, msg: Option<&str>) -> ! {
     match msg {
         Some(msg) => eprintln!("{}", msg),
         None => {}
     }
-    std::process::exit(code);
+    std::process::exit(code)
 }
